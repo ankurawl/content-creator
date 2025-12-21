@@ -1,0 +1,22 @@
+# Environment files
+.env
+.env.local
+
+# Claude Code - exclude session data but keep project config
+.claude/*
+!.claude/mcp_settings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
