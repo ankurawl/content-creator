@@ -2,15 +2,16 @@
 
 This guide walks you through setting up the Financial Modeling Prep (FMP) MCP server for use with Claude Code to enable accurate, real-time financial data access for article generation.
 
-**This setup uses a local `.env` file** in the project folder to keep credentials project-specific and portable.
+**This setup uses HTTP transport** - the FMP server runs locally on port 8080 and Claude Code connects to it via HTTP.
 
 ---
 
 ## Prerequisites
 
-- Claude Desktop installed on your system
+- Claude Code installed on your system
 - Node.js and npm installed (check with `node --version` and `npm --version`)
 - Internet connection
+- A separate terminal window to run the FMP server
 
 ---
 
@@ -23,122 +24,96 @@ This guide walks you through setting up the Financial Modeling Prep (FMP) MCP se
    - Free tier provides: 250 requests/day
    - Sufficient for 10-15 articles per day
 
-**Save your API key** - you'll need it in Step 2.
-
 ---
 
-## Step 2: Create Local .env File
+## Step 2: Create Project-Level MCP Configuration
 
-1. **Navigate to the project directory**:
-   ```bash
-   cd /Library/exploring-claude/content-creator
+We use a **project-specific MCP configuration** that connects to a locally running HTTP server.
+
+1. **The `.mcp.json` file should already exist** with this configuration:
+
+   ```json
+   {
+     "mcpServers": {
+       "fmp-mcp": {
+         "type": "http",
+         "url": "http://localhost:8080/mcp"
+       }
+     }
+   }
    ```
-
-2. **Create a `.env` file**:
-   ```bash
-   touch .env
-   ```
-
-3. **Open `.env` in your text editor** and add your FMP API key:
-   ```
-   FMP_API_KEY=your_actual_api_key_here
-   ```
-
-   **Example**:
-   ```
-   FMP_API_KEY=abc123def456ghi789jkl012mno345pqr678
-   ```
-
-4. **Save the file**
-
-**Important**: The `.env` file stores sensitive credentials. Never commit it to version control.
-
----
-
-## Step 3: Create Project-Level MCP Configuration
-
-Instead of modifying the global Claude Desktop configuration, we'll create a **project-specific MCP settings file** in this folder.
-
-1. **Create `.claude/mcp_settings.json` in the project directory**:
-
-   ```bash
-   mkdir -p .claude
-   touch .claude/mcp_settings.json
-   ```
-
-2. **Open `.claude/mcp_settings.json` in your text editor**
-
-3. **Add the FMP MCP server configuration**:
-
-```json
-{
-  "mcpServers": {
-    "fmp": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fmp"],
-      "env": {}
-    }
-  }
-}
-```
 
 **Key configuration details:**
-- `"command": "npx"`: Uses npx to run the FMP MCP server package
-- `"args": ["-y", "@modelcontextprotocol/server-fmp"]`: Auto-confirms and specifies the server package
-- `"env": {}`: Empty object - the MCP server will automatically load `FMP_API_KEY` from the `.env` file in this directory
-
-**If you need to add other MCP servers later**, add them inside the `mcpServers` object:
-
-```json
-{
-  "mcpServers": {
-    "fmp": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fmp"],
-      "env": {}
-    },
-    "another-server": {
-      "command": "...",
-      "args": ["..."]
-    }
-  }
-}
-```
-
-4. **Save the file**
+- `"type": "http"`: Uses HTTP transport to connect to the server
+- `"url"`: Points to the locally running FMP server
+- No API key in this file - it's passed when starting the server
 
 ---
 
-## Step 4: Configure Claude Code to Use Project Settings
+## Step 3: Start the FMP MCP Server
 
-When you launch Claude Code in this project directory, it will automatically detect and load `.claude/mcp_settings.json`.
+**IMPORTANT**: The server must be running before Claude Code can connect to it.
 
-**To verify the configuration is loaded:**
-- Claude Code reads MCP settings from `.claude/mcp_settings.json` when present
-- This takes precedence over global user-level settings for this project only
-- Other projects remain unaffected
+1. **Open a separate terminal window**
 
----
-
-## Step 5: Verify MCP Server Connection
-
-With project-level configuration, there's no need to restart Claude Desktop. Simply start or restart your Claude Code session in this project.
-
-1. **Navigate to the project directory in your terminal**:
+2. **Navigate to your project directory**:
    ```bash
-   cd /Library/exploring-claude/content-creator
+   cd /path/to/content-creator
    ```
 
-2. **Start Claude Code** (if not already running):
+3. **Start the server with your API key**:
+   ```bash
+   FMP_ACCESS_TOKEN=your_actual_api_key_here npx -y financial-modeling-prep-mcp-server
+   ```
+
+   Replace `your_actual_api_key_here` with your FMP API key from Step 1.
+
+4. **Verify the server started successfully**. You should see:
+   ```
+   [McpServer] ✅ Routes configured successfully
+   [FmpMcpServer] 🚀 MCP Server started successfully on port 8080
+   [FmpMcpServer] 🏥 Health endpoint available at http://localhost:8080/healthcheck
+   [FmpMcpServer] 🔌 MCP endpoint available at http://localhost:8080/mcp
+   ```
+
+5. **Keep this terminal window open** - the server must stay running while you use Claude Code.
+
+**Optional: Test the server**
+```bash
+# In another terminal
+curl http://localhost:8080/healthcheck
+```
+
+**Convenience Script (Recommended):**
+
+For easier server management, use the included helper script:
+
+```bash
+# Set your API key once
+export FMP_ACCESS_TOKEN=your_api_key_here
+
+# Start the server
+./start-fmp-server.sh
+```
+
+The script will:
+- Check if your API key is set
+- Detect if port 8080 is already in use
+- Start the server with helpful status messages
+
+---
+
+## Step 4: Launch Claude Code and Verify Connection
+
+1. **With the FMP server running**, launch Claude Code in this project directory:
    ```bash
    claude code
    ```
 
-3. **Test the connection** by asking Claude to use the FMP MCP:
-
-```
-Can you check if the FMP MCP server is available? If so, get the current market cap for Apple (AAPL).
-```
+2. **Test the connection** by asking Claude:
+   ```
+   Is the FMP MCP server connected? If so, get the current market cap for Apple (AAPL).
+   ```
 
 **Expected behavior:**
 - Claude should confirm FMP MCP is available
@@ -146,15 +121,15 @@ Can you check if the FMP MCP server is available? If so, get the current market 
 - You should see data sourced from Financial Modeling Prep
 
 **If the test fails:**
-- Check that your `.env` file exists in this directory: `/Library/exploring-claude/content-creator/.env`
-- Verify the API key has no quotes or extra spaces in `.env`
-- Confirm `.claude/mcp_settings.json` exists and is properly formatted (valid JSON)
+- **Most common issue**: Server not running - check your terminal window
+- Verify the server is running on port 8080 (check the terminal output)
+- Confirm `.mcp.json` exists and has the correct HTTP configuration
 - Restart your Claude Code session
-- Check terminal/console for error messages
+- Check server logs in the terminal for error messages
 
 ---
 
-## Step 6: Test with Content Creation Workflow
+## Step 5: Test with Content Creation Workflow
 
 Navigate to your content-creator directory and test the full validation workflow:
 
@@ -175,42 +150,57 @@ I'd like to write an article comparing Microsoft and Apple market caps. Can you 
 After setup, your project should look like this:
 
 ```
-/Library/exploring-claude/content-creator/
-├── .claude/
-│   └── mcp_settings.json   # Project-specific MCP configuration
-├── .env                    # Your FMP API key (DO NOT COMMIT)
-├── .env.example            # Template for others
-├── .gitignore              # Excludes .env and .claude/ from version control
+content-creator/
+├── .claude/                # Claude Code session data (gitignored)
+├── .mcp.json               # HTTP MCP configuration (safe to commit)
+├── .mcp.json.example       # Template for others
+├── .gitignore              # Git ignore rules
 ├── CLAUDE.md               # Validation workflow instructions
-├── FMP-SETUP.md           # This file
-├── prompt.md              # Article template
-└── article.md             # Generated output
+├── FMP-SETUP.md            # This file
+├── start-fmp-server.sh     # Helper script to start FMP server
+├── prompt.md               # Article template
+└── article.md              # Generated output
 ```
+
+**Note**: The `.mcp.json` file does NOT contain your API key - it only has the HTTP endpoint configuration. The API key is passed when you start the server manually.
 
 ---
 
 ## Troubleshooting
 
-### Error: "FMP MCP server not found"
+### Error: "FMP MCP server not connected" or "Cannot connect to server"
 
-**Cause**: MCP configuration file not found or incorrect format
-
-**Solution**:
-1. Verify `.claude/mcp_settings.json` exists in the project directory
-2. Check that JSON is properly formatted (no trailing commas, proper quotes)
-3. Restart your Claude Code session
-4. Verify you're running Claude Code from the project directory: `/Library/exploring-claude/content-creator`
-
-### Error: "API key invalid" or "Environment variable not found"
-
-**Cause**: `.env` file not loading or incorrect format
+**Cause**: The FMP server is not running
 
 **Solution**:
-1. Verify `.env` exists in `/Library/exploring-claude/content-creator/` (same directory as `.claude/`)
-2. Check format: `FMP_API_KEY=your_key` (no quotes, no spaces around `=`)
-3. Ensure you're running Claude Code from the project directory
-4. Log into FMP dashboard and verify your API key
-5. Restart your Claude Code session after fixing `.env`
+1. **Check if the server is running** - look for the terminal window where you started it
+2. **Start the server** if it's not running:
+   ```bash
+   FMP_ACCESS_TOKEN=your_api_key npx -y financial-modeling-prep-mcp-server
+   ```
+3. Verify the server shows the success message on port 8080
+4. Restart your Claude Code session
+
+### Error: "Server access token is required" when starting the server
+
+**Cause**: API key not provided when starting the server
+
+**Solution**:
+1. Make sure you include `FMP_ACCESS_TOKEN=` before the npx command
+2. Verify your API key is correct (copy from FMP dashboard)
+3. Example: `FMP_ACCESS_TOKEN=abc123xyz npx -y financial-modeling-prep-mcp-server`
+
+### Error: "Port 8080 already in use"
+
+**Cause**: Another process is using port 8080, or you already have the FMP server running
+
+**Solution**:
+1. Check if you already have the server running in another terminal
+2. Kill the existing process:
+   ```bash
+   lsof -ti:8080 | xargs kill
+   ```
+3. Start the server again
 
 ### Error: "Rate limit exceeded"
 
@@ -221,44 +211,34 @@ After setup, your project should look like this:
 2. Upgrade to paid FMP tier ($14-29/month for higher limits)
 3. Use fallback web research workflow temporarily
 
-### Error: "Cannot find module @modelcontextprotocol/server-fmp"
+### Error: "Cannot find module financial-modeling-prep-mcp-server"
 
 **Cause**: NPX unable to download package
 
 **Solution**:
 1. Check internet connection
-2. Manually install globally: `npm install -g @modelcontextprotocol/server-fmp`
-3. Update `.claude/mcp_settings.json` to use global installation:
+2. Clear npm cache: `npm cache clean --force`
+3. Try again with npx -y flag (auto-install)
+4. Manually install globally: `npm install -g financial-modeling-prep-mcp-server`
+
+### Claude Code doesn't see the HTTP server
+
+**Cause**: Configuration issue or server not running
+
+**Solution**:
+1. Verify `.mcp.json` has the correct HTTP configuration:
    ```json
    {
      "mcpServers": {
-       "fmp": {
-         "command": "mcp-server-fmp",
-         "args": [],
-         "env": {}
+       "fmp-mcp": {
+         "type": "http",
+         "url": "http://localhost:8080/mcp"
        }
      }
    }
    ```
-4. Restart Claude Code session
-
-### Error: "Working directory does not exist"
-
-**Cause**: Running Claude Code from wrong directory
-
-**Solution**:
-1. Navigate to the correct project directory:
-   ```bash
-   cd /Library/exploring-claude/content-creator
-   ```
-2. Verify you're in the right place:
-   ```bash
-   ls -la .claude/mcp_settings.json .env
-   ```
-3. Start Claude Code from this directory:
-   ```bash
-   claude code
-   ```
+2. Test the server manually: `curl http://localhost:8080/healthcheck`
+3. Restart Claude Code after verifying the server is running
 
 ---
 
@@ -299,27 +279,34 @@ Once configured, Claude can access:
 
 ## Security Best Practices
 
-1. **Never commit `.env` to version control**
-   - Already excluded in `.gitignore`
-   - If accidentally committed, rotate your API key immediately
-
-2. **DO commit `.claude/mcp_settings.json`**
-   - This file contains no secrets (only server configuration)
-   - Safe to share with team members
-   - Allows consistent setup across different machines
-
-3. **Use `.env.example` for sharing**
-   - Template file showing required variables without actual keys
-   - Safe to commit to version control
-
-4. **Keep API keys private**
+1. **Keep API keys private**
+   - Never commit your API key to version control
    - Don't share in chat, screenshots, or documentation
-   - Rotate keys if exposed
+   - The API key is only used when starting the server (via `FMP_ACCESS_TOKEN=`)
+   - Rotate keys immediately if exposed at https://financialmodelingprep.com
+
+2. **The `.mcp.json` file is SAFE to commit**
+   - It only contains the HTTP endpoint configuration
+   - No secrets or API keys are stored in this file
+   - Can be shared with team members
+
+3. **Use environment variables for the server**
+   - Store your API key in a shell script or environment file
+   - Example `.env` file approach:
+     ```bash
+     # .env (add to .gitignore!)
+     export FMP_ACCESS_TOKEN=your_api_key_here
+     ```
+   - Then source it: `source .env && npx -y financial-modeling-prep-mcp-server`
 
 **Project portability:**
-- Team members only need to: (1) clone the repo, (2) add their own `.env` file, (3) start Claude Code
-- No global configuration changes needed
-- Each project can use different MCP servers without conflicts
+- Team members only need to:
+  1. Clone the repo
+  2. Get their own FMP API key
+  3. Start the server with their API key
+  4. Launch Claude Code
+- No configuration file changes needed
+- The `.mcp.json` file works for everyone
 
 ---
 
@@ -338,19 +325,56 @@ This ensures article generation can continue even without API access.
 
 ---
 
+## Workflow Summary
+
+Every time you want to use the FMP MCP server:
+
+1. **Start the FMP server** (in a separate terminal):
+
+   **Option A: Using the helper script (recommended)**
+   ```bash
+   export FMP_ACCESS_TOKEN=your_api_key
+   ./start-fmp-server.sh
+   ```
+
+   **Option B: Direct command**
+   ```bash
+   FMP_ACCESS_TOKEN=your_api_key npx -y financial-modeling-prep-mcp-server
+   ```
+
+   Leave this terminal running.
+
+2. **Launch Claude Code**:
+   ```bash
+   claude code
+   ```
+
+3. **Verify connection** by asking Claude to test the FMP server
+
+4. **Use the server** for article validation and data gathering
+
+5. **Stop the server** when done (Ctrl+C in the server terminal)
+
+---
+
 ## Next Steps
 
 1. ✓ FMP API key obtained
-2. ✓ Local `.env` file created with API key
-3. ✓ Project-level `.claude/mcp_settings.json` created
-4. ✓ Claude Code session started in project directory
-5. ✓ Connection verified
-6. **Ready to use**: Start writing articles with validated data!
+2. ✓ `.mcp.json` configured with HTTP endpoint
+3. ✓ FMP server tested and working
+4. ✓ Claude Code connection verified
+5. **Ready to use**: Start writing articles with validated data!
 
-**Benefits of project-level setup:**
-- No changes to your global Claude Desktop configuration
-- Each project can have different MCP servers
-- Easy to share configuration with team members (commit `.claude/mcp_settings.json`)
-- Portable across machines - just add `.env` file
+**Benefits of HTTP transport setup:**
+- Simple HTTP-based connection
+- No complex stdio configuration needed
+- API key kept out of configuration files
+- Server can be easily restarted if needed
+- Multiple Claude Code sessions can share one server
 
-Refer to `/Library/exploring-claude/content-creator/CLAUDE.md` for the complete validation workflow integrated into all article generation.
+**Important reminders:**
+- The FMP server must be running before launching Claude Code
+- Keep the server terminal open while working
+- The server uses port 8080 (make sure it's available)
+
+Refer to `CLAUDE.md` for the complete validation workflow integrated into all article generation.

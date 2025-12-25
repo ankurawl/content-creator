@@ -1,10 +1,12 @@
-# Environment files
+# Environment files (may contain API keys)
 .env
 .env.local
 
-# Claude Code - exclude session data but keep project config
-.claude/*
-!.claude/mcp_settings.json
+# Note: .mcp.json is safe to commit - it only contains HTTP endpoint config
+# The API key is passed when starting the server manually
+
+# Claude Code session data
+.claude/
 
 # OS files
 .DS_Store
