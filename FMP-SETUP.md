@@ -61,22 +61,25 @@ We use a **project-specific MCP configuration** that connects to a locally runni
    cd /path/to/content-creator
    ```
 
-3. **Start the server with your API key (or see convenience script below)**: 
+3. **Update the API key in .env file**:  
+   ```
+   # FMP (Financial Modeling Prep) API Configuration
+   # Get your API key from: https://site.financialmodelingprep.com/developer/docs
+   # Replace `your_actual_api_key_here` with your FMP API key.
+
+   FMP_ACCESS_TOKEN=your_actual_api_key_here 
+   ```
+
+4. **Start the server with your API key (or see convenience script below)**: 
    ```bash
    FMP_ACCESS_TOKEN=your_actual_api_key_here npx -y financial-modeling-prep-mcp-server
    ```
-
-   Replace `your_actual_api_key_here` with your FMP API key from Step 1.
-
 
 **Convenience Script (Recommended):**
 
 For easier server management, use the included helper script:
 
 ```bash
-# Set your API key once
-export FMP_ACCESS_TOKEN=your_api_key_here
-
 # Start the server
 ./start-fmp-server.sh
 ```
@@ -153,6 +156,7 @@ After setup, your project should look like this:
 ```
 content-creator/
 ├── .claude/                # Claude Code session data (gitignored)
+├── .env                    # env file with API keys (Not committed by Git Ignore rules)
 ├── .mcp.json               # HTTP MCP configuration (safe to commit)
 ├── .mcp.json.example       # Template for others
 ├── .gitignore              # Git ignore rules
@@ -163,33 +167,9 @@ content-creator/
 └── article.md              # Generated output
 ```
 
-**Note**: The `.mcp.json` file does NOT contain your API key - it only has the HTTP endpoint configuration. The API key is passed when you start the server manually.
-
 ---
 
 ## Troubleshooting
-
-### Error: "FMP MCP server not connected" or "Cannot connect to server"
-
-**Cause**: The FMP server is not running
-
-**Solution**:
-1. **Check if the server is running** - look for the terminal window where you started it
-2. **Start the server** if it's not running:
-   ```bash
-   FMP_ACCESS_TOKEN=your_api_key npx -y financial-modeling-prep-mcp-server
-   ```
-3. Verify the server shows the success message on port 8080
-4. Restart your Claude Code session
-
-### Error: "Server access token is required" when starting the server
-
-**Cause**: API key not provided when starting the server
-
-**Solution**:
-1. Make sure you include `FMP_ACCESS_TOKEN=` before the npx command
-2. Verify your API key is correct (copy from FMP dashboard)
-3. Example: `FMP_ACCESS_TOKEN=abc123xyz npx -y financial-modeling-prep-mcp-server`
 
 ### Error: "Port 8080 already in use"
 
@@ -325,57 +305,3 @@ If FMP MCP is unavailable or rate-limited, the validation workflow automatically
 This ensures article generation can continue even without API access.
 
 ---
-
-## Workflow Summary
-
-Every time you want to use the FMP MCP server:
-
-1. **Start the FMP server** (in a separate terminal):
-
-   **Option A: Using the helper script (recommended)**
-   ```bash
-   export FMP_ACCESS_TOKEN=your_api_key
-   ./start-fmp-server.sh
-   ```
-
-   **Option B: Direct command**
-   ```bash
-   FMP_ACCESS_TOKEN=your_api_key npx -y financial-modeling-prep-mcp-server
-   ```
-
-   Leave this terminal running.
-
-2. **Launch Claude Code**:
-   ```bash
-   claude code
-   ```
-
-3. **Verify connection** by asking Claude to test the FMP server
-
-4. **Use the server** for article validation and data gathering
-
-5. **Stop the server** when done (Ctrl+C in the server terminal)
-
----
-
-## Next Steps
-
-1. ✓ FMP API key obtained
-2. ✓ `.mcp.json` configured with HTTP endpoint
-3. ✓ FMP server tested and working
-4. ✓ Claude Code connection verified
-5. **Ready to use**: Start writing articles with validated data!
-
-**Benefits of HTTP transport setup:**
-- Simple HTTP-based connection
-- No complex stdio configuration needed
-- API key kept out of configuration files
-- Server can be easily restarted if needed
-- Multiple Claude Code sessions can share one server
-
-**Important reminders:**
-- The FMP server must be running before launching Claude Code
-- Keep the server terminal open while working
-- The server uses port 8080 (make sure it's available)
-
-Refer to `CLAUDE.md` for the complete validation workflow integrated into all article generation.

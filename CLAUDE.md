@@ -25,6 +25,7 @@ This is a content creation workspace for generating data-driven articles. The wo
 ## Critical Writing Requirements
 
 ### Writing Style Requirements
+
 - IMPORTANT: Write like a story with a beginning, middle, and end
   - Beginning: Set up the question or problem (1-2 paragraphs)
   - Middle: Present evidence in a logical flow that builds toward a conclusion (bulk of article)
@@ -34,13 +35,24 @@ This is a content creation workspace for generating data-driven articles. The wo
   - Good: "Nvidia's market cap grew from $360B in 2020 to $3.1T in 2024"
   - Bad: "PE ratios remain within historical ranges"
   - Good: "Microsoft's P/E of 35 sits near its 5-year average of 33"
+
+**Do:**
 - Direct, concise narrative suitable for business executives
-- Fact-based analysis with minimal adjectives
+- Fact-based analysis with minimal adjectives; Use specific numbers and company names
 - Simple sentence structure and vocabulary (avoid jargon)
 - Make scannable: bullet points, numbered lists, short paragraphs (2-3 sentences)
 - Cite specific data sources for all statistics
 - Include a "Sources" section at the end
 - Avoid superlatives and phrases like "revolutionizing" or "game-changing"
+- Include 1-2 brief quotes from executives (if found in earnings calls/announcements)
+- Cite data sources in footnotes 
+
+**Don't:**
+- Make unsupported claims about causation
+- Oversimplify complex economic factors
+- Ignore counterarguments (briefly acknowledge that some argue these are still primarily cost-cutting measures) 
+- Use jargon without explanation 
+- Exceed 500 words (±25 words acceptable) 
 
 ### Narrative Flow Requirements
 - Build arguments progressively in ONE direction - do not circle back to earlier points
