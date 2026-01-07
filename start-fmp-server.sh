@@ -8,15 +8,33 @@ echo "  Starting FMP MCP Server"
 echo "==================================================="
 echo ""
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    echo "📄 Loading environment variables from .env file..."
+    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    echo ""
+else
+    echo "⚠️  Warning: .env file not found"
+    echo "Creating .env template..."
+    cat > .env << 'EOF'
+# FMP (Financial Modeling Prep) API Configuration
+# Get your API key from: https://site.financialmodelingprep.com/developer/docs
+
+FMP_ACCESS_TOKEN=your_api_key_here
+EOF
+    echo "✓ Created .env file"
+    echo "Please edit .env and add your FMP_ACCESS_TOKEN, then run this script again."
+    echo ""
+    exit 1
+fi
+
 # Check if FMP_ACCESS_TOKEN is set
-if [ -z "$FMP_ACCESS_TOKEN" ]; then
-    echo "❌ Error: FMP_ACCESS_TOKEN environment variable is not set"
+if [ -z "$FMP_ACCESS_TOKEN" ] || [ "$FMP_ACCESS_TOKEN" = "your_api_key_here" ]; then
+    echo "❌ Error: FMP_ACCESS_TOKEN is not configured"
     echo ""
-    echo "Please set your FMP API key:"
-    echo "  export FMP_ACCESS_TOKEN=your_api_key_here"
+    echo "Please edit the .env file and replace 'your_api_key_here' with your actual FMP API key"
     echo ""
-    echo "Or run this script with the API key:"
-    echo "  FMP_ACCESS_TOKEN=your_api_key ./start-fmp-server.sh"
+    echo "Get your API key from: https://site.financialmodelingprep.com/developer/docs"
     echo ""
     exit 1
 fi

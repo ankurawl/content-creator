@@ -61,28 +61,13 @@ We use a **project-specific MCP configuration** that connects to a locally runni
    cd /path/to/content-creator
    ```
 
-3. **Start the server with your API key**:
+3. **Start the server with your API key (or see convenience script below)**: 
    ```bash
    FMP_ACCESS_TOKEN=your_actual_api_key_here npx -y financial-modeling-prep-mcp-server
    ```
 
    Replace `your_actual_api_key_here` with your FMP API key from Step 1.
 
-4. **Verify the server started successfully**. You should see:
-   ```
-   [McpServer] ✅ Routes configured successfully
-   [FmpMcpServer] 🚀 MCP Server started successfully on port 8080
-   [FmpMcpServer] 🏥 Health endpoint available at http://localhost:8080/healthcheck
-   [FmpMcpServer] 🔌 MCP endpoint available at http://localhost:8080/mcp
-   ```
-
-5. **Keep this terminal window open** - the server must stay running while you use Claude Code.
-
-**Optional: Test the server**
-```bash
-# In another terminal
-curl http://localhost:8080/healthcheck
-```
 
 **Convenience Script (Recommended):**
 
@@ -100,6 +85,22 @@ The script will:
 - Check if your API key is set
 - Detect if port 8080 is already in use
 - Start the server with helpful status messages
+
+4. **Verify the server started successfully**. You should see:
+   ```
+   [McpServer] ✅ Routes configured successfully
+   [FmpMcpServer] 🚀 MCP Server started successfully on port 8080
+   [FmpMcpServer] 🏥 Health endpoint available at http://localhost:8080/healthcheck
+   [FmpMcpServer] 🔌 MCP endpoint available at http://localhost:8080/mcp
+   ```
+
+5. **Keep this terminal window open** - the server must stay running while you use Claude Code.
+
+**Optional: Test the server**
+```bash
+# In another terminal
+curl http://localhost:8080/healthcheck
+```
 
 ---
 
