@@ -1,24 +1,16 @@
 
 ## Topic
-Reason behind tech layoffs has changed over last 3 years - initially correction to pandemic overhiring , then economic environment , and now AI infra spending and expected productivity gains 
 
-## Target Audience 
-- Industry analysts 
-- Mid-career professionals (5-25 years experience) in tech industry 
-
----
 
 ## Core Thesis
 
-Tech layoffs have evolved: 
-i) in 2022-23, layoffs were due to the correction of pandemic-driven overhiring, 
-ii) in 2023-24, layoffs were due to macroeconomic environment like rising interest rates and profitability pressure, 
-iii) in 2024-25-26, the layoffs are due to companies spending more on AI capex and hence less on employees, as well as optimization of workforce structure with the expected productivity-boost in the coming years. 
+DFL-L decisions - Data Facts & Logic based taken in the Long-term interests of the company 
 
-Conclusion: 
-- Companies are reallocating resources from labor costs to AI infrastructure investments. The shift is structural workforce transformation, not cyclical belt tightening. 
-- The financial calculus has changed: Companies are trading labor opex for AI capex with expectation of multiplied productivity. 
-- Employees have agency. The best way for employees to stay relevant is to boost their own productivity by learning and leveraging AI in their work. AI skills are no longer a differentiator, but an important component to ensuring job security. 
+Vibes decisions 
+
+
+## Conclusion 
+
 
 
 ---
